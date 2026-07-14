@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.core.cache import cache
 from django.db import transaction
 from django.test import TestCase
 from rest_framework.test import APITestCase
@@ -103,9 +104,16 @@ class BarcodeApiTests(APITestCase):
             f"/api/barcodes/{first['id']}/", {"is_active": False}, format="json"
         )
         default_list = self.client.get("/api/barcodes/")
-        self.assertEqual(len(default_list.data), 1)
+        self.assertEqual(len(default_list.data["results"]), 1)
         full_list = self.client.get("/api/barcodes/?include_inactive=true")
-        self.assertEqual(len(full_list.data), 2)
+        self.assertEqual(len(full_list.data["results"]), 2)
+
+    def test_list_is_paginated(self):
+        self.create_barcode()
+        response = self.client.get("/api/barcodes/")
+        self.assertIn("count", response.data)
+        self.assertIn("next", response.data)
+        self.assertIn("results", response.data)
 
 
 class UnitApiTests(APITestCase):
@@ -135,3 +143,24 @@ class UnitApiTests(APITestCase):
         unit = Unit.objects.create(name="Silinemez", barcode_prefix="SLN", fields=[])
         response = self.client.delete(f"/api/units/{unit.pk}/")
         self.assertEqual(response.status_code, 405)
+
+
+class LoginThrottleTests(APITestCase):
+    def setUp(self):
+        cache.clear()
+        User.objects.create_user("kubra", password="test1234")
+
+    def tearDown(self):
+        cache.clear()
+
+    def test_too_many_login_attempts_are_throttled(self):
+        # settings.py: REST_FRAMEWORK.DEFAULT_THROTTLE_RATES["login"] = "10/min"
+        for _ in range(10):
+            response = self.client.post(
+                "/api/token/", {"username": "kubra", "password": "wrong"}, format="json"
+            )
+            self.assertEqual(response.status_code, 401)
+        response = self.client.post(
+            "/api/token/", {"username": "kubra", "password": "wrong"}, format="json"
+        )
+        self.assertEqual(response.status_code, 429)

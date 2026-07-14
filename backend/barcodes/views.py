@@ -1,10 +1,19 @@
 from django.db import transaction
 from rest_framework import status, viewsets
 from rest_framework.response import Response
+from rest_framework.throttling import ScopedRateThrottle
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 from .models import Barcode, PrintPreset, Unit
 from .serializers import BarcodeSerializer, PrintPresetSerializer, UnitSerializer
 from .services import generate_barcode_name
+
+
+class ThrottledTokenObtainPairView(TokenObtainPairView):
+    # limits login attempts per IP address (brute-force protection); rate is
+    # configured under REST_FRAMEWORK.DEFAULT_THROTTLE_RATES["login"]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "login"
 
 
 class UnitViewSet(viewsets.ModelViewSet):
