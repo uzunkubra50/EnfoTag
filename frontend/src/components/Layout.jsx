@@ -16,6 +16,7 @@ export default function Layout() {
         <nav>
           <NavLink to="/units">Birimler</NavLink>
           <NavLink to="/barcodes/new">Barkod Oluştur</NavLink>
+          <NavLink to="/print">Yazdır</NavLink>
         </nav>
         <button className="button-secondary button-small" onClick={handleLogout}>
           Çıkış Yap

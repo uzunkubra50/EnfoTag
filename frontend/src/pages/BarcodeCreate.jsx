@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { createBarcode } from "../api/barcodes";
 import { apiErrorMessage } from "../api/client";
 import { getUnit, getUnits } from "../api/units";
@@ -15,6 +16,7 @@ export default function BarcodeCreate() {
   const [created, setCreated] = useState(null);
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     getUnits()
@@ -146,6 +148,14 @@ export default function BarcodeCreate() {
               </div>
             </div>
           </div>
+          <button
+            type="button"
+            className="button-secondary"
+            style={{ marginTop: "1rem", display: "block" }}
+            onClick={() => navigate(`/print?barcode=${created.id}`)}
+          >
+            Bu Barkodu Yazdır
+          </button>
         </div>
       )}
     </>
