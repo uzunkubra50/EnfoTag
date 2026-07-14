@@ -1,4 +1,4 @@
-import client from "./client";
+import client, { fetchAllResults } from "./client";
 
 export async function createBarcode(barcode) {
   const { data } = await client.post("/barcodes/", barcode);
@@ -11,10 +11,10 @@ export async function getBarcode(id) {
 }
 
 export async function getBarcodes(includeInactive = false) {
-  const { data } = await client.get("/barcodes/", {
-    params: includeInactive ? { include_inactive: "true" } : {},
-  });
-  return data;
+  return fetchAllResults(
+    "/barcodes/",
+    includeInactive ? { include_inactive: "true" } : {}
+  );
 }
 
 export async function updateBarcode(id, changes) {

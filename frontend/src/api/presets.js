@@ -1,8 +1,7 @@
-import client from "./client";
+import client, { fetchAllResults } from "./client";
 
 export async function getPresets() {
-  const { data } = await client.get("/presets/");
-  return data;
+  return fetchAllResults("/presets/");
 }
 
 export async function createPreset(preset) {

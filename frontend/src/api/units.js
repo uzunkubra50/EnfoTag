@@ -1,8 +1,7 @@
-import client from "./client";
+import client, { fetchAllResults } from "./client";
 
 export async function getUnits() {
-  const { data } = await client.get("/units/");
-  return data;
+  return fetchAllResults("/units/");
 }
 
 export async function getUnit(id) {

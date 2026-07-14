@@ -38,6 +38,24 @@ client.interceptors.response.use(
   }
 );
 
+// list endpoints are paginated (DRF PageNumberPagination: {results, next, ...});
+// this follows `next` until exhausted so callers keep getting a plain array
+export async function fetchAllResults(path, params = {}) {
+  const results = [];
+  let url = path;
+  let config = { params };
+  while (url) {
+    const { data } = await client.get(url, config);
+    if (!data || !Array.isArray(data.results)) {
+      return Array.isArray(data) ? data : results;
+    }
+    results.push(...data.results);
+    url = data.next;
+    config = undefined; // `next` is already a full URL with its query string
+  }
+  return results;
+}
+
 // turn a DRF error response into a single readable message
 export function apiErrorMessage(error, fallback = "Bir hata oluştu.") {
   if (!error.response) {
