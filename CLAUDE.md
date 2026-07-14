@@ -168,11 +168,11 @@ docker compose up --build            # db + backend + frontend
 
 ## Yol Haritası / Durum
 
-- [x] **Aşama 1:** Kurulum, modeller, migration, admin kaydı, superuser (1-2 gün)
-- [x] **Aşama 2:** JWT + CORS + Unit/Barcode/Preset endpoint'leri + Postman testi (3 gün)
+- [x] **Aşama 1:** Kurulum, modeller, migration, admin kaydı, superuser
+- [x] **Aşama 2:** JWT + CORS + Unit/Barcode/Preset endpoint'leri + Postman testi
 - [x] **Aşama 3:** Login → Unit ekranı → Barkod oluşturma (dinamik alanlar + görselleştirme)
-      → Yazdırma (grid + print CSS + preset) → Düzenleme listesi (3-4 gün)
-- [x] **Aşama 4:** Docker compose, uçtan uca test, README, demo (1-2 gün)
+      → Yazdırma (grid + print CSS + preset) → Düzenleme listesi
+- [x] **Aşama 4:** Docker compose, uçtan uca test, README, demo
 
 ## Kurallar / Konvansiyonlar
 

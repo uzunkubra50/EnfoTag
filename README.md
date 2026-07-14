@@ -34,7 +34,7 @@ yalnızca etiketlerin bastırılması:
 /frontend
   /src
     /pages       # Login, Units, BarcodeCreate, BarcodePrint, BarcodeList
-    /components  # Layout, ProtectedRoute, BarcodePreview
+    /components  # Layout, ProtectedRoute, BarcodePreview, BrandMark
     /api         # axios instance + endpoint fonksiyonları
   Dockerfile
 docker-compose.yml
@@ -42,7 +42,7 @@ docker-compose.yml
 
 ## Çalıştırma — Docker (önerilen)
 
-Tek komutla üç servisi de (PostgreSQL + Django + React) ayağa kaldırır:
+Tek komutla PostgreSQL + Django + React'i ayağa kaldırır:
 
 ```bash
 docker compose up --build
@@ -59,6 +59,16 @@ docker compose exec backend python manage.py createsuperuser
 ```
 
 Durdurmak için `Ctrl+C`, ardından `docker compose down` (veritabanını da silmek isterseniz `docker compose down -v`).
+
+### Veritabanını tarayıcıdan görüntüleme (Adminer)
+
+Geliştirme kolaylığı için stack'e [Adminer](https://www.adminer.org/) eklendi — masaüstü bir
+istemci kurmadan, tarayıcıdan veritabanına bakabilirsiniz:
+
+- http://localhost:8080 → System: `PostgreSQL`, Server: `db`, Username: `barkod`,
+  Password: `barkod`, Database: `barkod`
+
+Uygulamanın bir parçası değildir, sadece geliştirici aracıdır.
 
 ## Çalıştırma — Yerel Geliştirme (Docker'sız)
 

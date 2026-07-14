@@ -42,5 +42,13 @@ services:
     depends_on:
       - backend
 
+  # web-based database browser (dev convenience, not part of the app itself)
+  adminer:
+    image: adminer:latest
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+
 volumes:
   pgdata:
