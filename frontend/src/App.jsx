@@ -1,7 +1,8 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
-import Home from "./pages/Home";
 import Login from "./pages/Login";
+import Units from "./pages/Units";
 
 export default function App() {
   return (
@@ -9,13 +10,15 @@ export default function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route
-          path="/"
           element={
             <ProtectedRoute>
-              <Home />
+              <Layout />
             </ProtectedRoute>
           }
-        />
+        >
+          <Route path="/" element={<Navigate to="/units" replace />} />
+          <Route path="/units" element={<Units />} />
+        </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>

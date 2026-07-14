@@ -38,4 +38,20 @@ client.interceptors.response.use(
   }
 );
 
+// turn a DRF error response into a single readable message
+export function apiErrorMessage(error, fallback = "Bir hata oluştu.") {
+  if (!error.response) {
+    return "Sunucuya ulaşılamadı. Backend çalışıyor mu?";
+  }
+  const data = error.response.data;
+  if (data && typeof data === "object") {
+    const first = Object.values(data)[0];
+    const message = Array.isArray(first) ? first[0] : first;
+    if (typeof message === "string") {
+      return message;
+    }
+  }
+  return fallback;
+}
+
 export default client;
