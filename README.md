@@ -1,8 +1,21 @@
-# Barkod Yönetim Sistemi
+# EnfoTag — Barkod Yönetim Sistemi
 
 Kurum birimlerine özel barkod (`PREFIX-0000001`) üretip QR veya Code128 şerit olarak
 görselleştiren, ayarlanabilir etiket düzeniyle yazdıran tam yığın (Django + React) bir
 arşiv barkod modülü. Detaylı iş kuralları ve mimari kararlar için [CLAUDE.md](CLAUDE.md)'ye bakın.
+
+## Ekran Görüntüleri
+
+| Giriş | Barkod Oluşturma |
+|---|---|
+| ![Giriş ekranı](docs/screens/login.png) | ![Barkod oluşturma ve önizleme](docs/screens/barcode-create.png) |
+| **Birimler** | **Barkod Listesi** |
+| ![Birim tanımlama](docs/screens/units.png) | ![Barkod listesi](docs/screens/barcode-list.png) |
+
+**Yazdırma ekranı** — mm bazlı gerçek boyut önizleme, preset yönetimi ve `@media print` ile
+yalnızca etiketlerin bastırılması:
+
+![Yazdırma ekranı](docs/screens/print.png)
 
 ## Teknoloji Yığını
 
