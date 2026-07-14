@@ -22,12 +22,21 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-502(iw3rwye#2!wzekeiet6o*rl3(6v$#ksleq%&^2_j!*tali'
+# Real deployments must set DJANGO_SECRET_KEY (see .env.example);
+# the fallback below is for local development only.
+SECRET_KEY = (
+    os.environ.get('DJANGO_SECRET_KEY')
+    or 'django-insecure-502(iw3rwye#2!wzekeiet6o*rl3(6v$#ksleq%&^2_j!*tali'
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DJANGO_DEBUG', '1') == '1'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+    if host.strip()
+]
 
 
 # Application definition
@@ -43,12 +52,14 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'rest_framework_simplejwt',
+    'drf_spectacular',
     # local
     'barcodes',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # serves static files under gunicorn
     'corsheaders.middleware.CorsMiddleware',  # must come before CommonMiddleware
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -140,6 +151,8 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
 
 # Django REST Framework: all endpoints require JWT auth by default
 # (login/refresh views override this with AllowAny)
@@ -151,6 +164,18 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
     ),
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+
+# OpenAPI schema + Swagger UI at /api/docs/
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'EnfoTag API',
+    'DESCRIPTION': 'Barkod üretim, yazdırma ve yönetim modülü REST API.',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'SERVE_PERMISSIONS': ['rest_framework.permissions.AllowAny'],
 }
 
 
