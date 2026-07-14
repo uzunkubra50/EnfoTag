@@ -62,8 +62,12 @@ export default function Units() {
 
   return (
     <>
-      <h1>Birimler</h1>
+      <header className="page-head">
+        <h1>Birimler</h1>
+        <p>Barkod üretecek kurum birimlerini ve indeks alanlarını tanımla.</p>
+      </header>
 
+      <div className="units-grid">
       <form className="card form-grid" onSubmit={handleSubmit}>
         <h2>Yeni Birim</h2>
         <label>
@@ -119,7 +123,7 @@ export default function Units() {
       <div className="card">
         <h2>Kayıtlı Birimler</h2>
         {units.length === 0 ? (
-          <p>Henüz birim eklenmemiş.</p>
+          <div className="empty">Henüz birim eklenmemiş. İlk birimini soldaki formdan oluştur.</div>
         ) : (
           <table>
             <thead>
@@ -140,6 +144,7 @@ export default function Units() {
             </tbody>
           </table>
         )}
+      </div>
       </div>
     </>
   );

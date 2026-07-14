@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { login } from "../api/auth";
+import BrandMark from "../components/BrandMark";
 
 export default function Login() {
   const [username, setUsername] = useState("");
@@ -29,31 +30,41 @@ export default function Login() {
 
   return (
     <div className="login-page">
-      <form className="card login-card" onSubmit={handleSubmit}>
+      <div className="login-panel">
+        <span className="brand-mark">
+          <BrandMark size={26} />
+        </span>
         <h1>Barkod Yönetim Sistemi</h1>
-        <label>
-          Kullanıcı Adı
-          <input
-            value={username}
-            onChange={(event) => setUsername(event.target.value)}
-            autoFocus
-            required
-          />
-        </label>
-        <label>
-          Şifre
-          <input
-            type="password"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            required
-          />
-        </label>
-        {error && <p className="error">{error}</p>}
-        <button type="submit" disabled={loading}>
-          {loading ? "Giriş yapılıyor..." : "Giriş Yap"}
-        </button>
-      </form>
+        <p className="login-sub">Devam etmek için hesabınla giriş yap.</p>
+
+        <form className="login-form" onSubmit={handleSubmit}>
+          <label>
+            Kullanıcı Adı
+            <input
+              value={username}
+              onChange={(event) => setUsername(event.target.value)}
+              placeholder="kullanıcı adın"
+              autoFocus
+              required
+            />
+          </label>
+          <label>
+            Şifre
+            <input
+              type="password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              placeholder="••••••••"
+              required
+            />
+          </label>
+          {error && <p className="error">{error}</p>}
+          <button type="submit" disabled={loading}>
+            {loading ? "Giriş yapılıyor..." : "Giriş Yap"}
+          </button>
+        </form>
+      </div>
+      <p className="login-foot">EnfoTag — Dijital Arşiv Barkod Modülü</p>
     </div>
   );
 }

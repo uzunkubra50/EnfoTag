@@ -95,7 +95,10 @@ export default function BarcodeList() {
 
   return (
     <>
-      <h1>Barkod Listesi</h1>
+      <header className="page-head">
+        <h1>Barkod Listesi</h1>
+        <p>Kayıtlı barkodları görüntüle, düzenle, pasife al veya yeniden yazdır.</p>
+      </header>
 
       {editing && (
         <div className="card form-grid">
@@ -149,7 +152,7 @@ export default function BarcodeList() {
         {info && <p className="success">{info}</p>}
 
         {barcodes.length === 0 ? (
-          <p>Gösterilecek barkod yok.</p>
+          <div className="empty">Gösterilecek barkod yok.</div>
         ) : (
           <table>
             <thead>

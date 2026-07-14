@@ -101,7 +101,10 @@ export default function BarcodePrint() {
   if (!barcodeId) {
     return (
       <>
-        <h1>Barkod Yazdır</h1>
+        <header className="page-head">
+          <h1>Barkod Yazdır</h1>
+          <p>Etiket ölçülerini ayarla, preset olarak kaydet ve yazdır.</p>
+        </header>
         <div className="card">
           <p>
             Yazdırılacak barkod seçilmedi.{" "}
@@ -115,7 +118,10 @@ export default function BarcodePrint() {
 
   return (
     <>
-      <h1 className="no-print">Barkod Yazdır</h1>
+      <header className="page-head no-print">
+        <h1>Barkod Yazdır</h1>
+        <p>Kağıt ve etiket ölçülerini ayarla; önizleme gerçek boyuttadır (mm).</p>
+      </header>
 
       <div className="card form-grid no-print">
         <h2>Yazdırma Ayarları</h2>

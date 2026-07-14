@@ -75,89 +75,102 @@ export default function BarcodeCreate() {
 
   return (
     <>
-      <h1>Barkod Oluştur</h1>
+      <header className="page-head">
+        <h1>Barkod Oluştur</h1>
+        <p>Birimi seç, indeks alanlarını doldur; sıradaki numara otomatik verilir.</p>
+      </header>
 
-      <form className="card form-grid" onSubmit={handleSubmit}>
-        <label>
-          Birim
-          <select value={unitId} onChange={handleUnitChange} required>
-            <option value="">Birim seçin...</option>
-            {units.map((unit) => (
-              <option key={unit.id} value={unit.id}>
-                {unit.name} ({unit.barcode_prefix})
-              </option>
-            ))}
-          </select>
-        </label>
-
-        {unitFields.map((field) => (
-          <label key={field}>
-            {field} <span className="hint">(boş bırakılırsa etikete basılmaz)</span>
-            <input
-              value={values[field] || ""}
-              onChange={(event) =>
-                setValues({ ...values, [field]: event.target.value })
-              }
-            />
+      <div className="create-grid">
+        <form className="card form-grid" onSubmit={handleSubmit}>
+          <h2>Barkod Bilgileri</h2>
+          <label>
+            Birim
+            <select value={unitId} onChange={handleUnitChange} required>
+              <option value="">Birim seçin...</option>
+              {units.map((unit) => (
+                <option key={unit.id} value={unit.id}>
+                  {unit.name} ({unit.barcode_prefix})
+                </option>
+              ))}
+            </select>
           </label>
-        ))}
 
-        <div className="field-list">
-          <span className="group-label">Görsel Tipi</span>
-          <div className="radio-row">
-            <label className="radio-option">
+          {unitFields.map((field) => (
+            <label key={field}>
+              {field} <span className="hint">(boş bırakılırsa etikete basılmaz)</span>
               <input
-                type="radio"
-                name="barcodeType"
-                checked={barcodeType === "qr"}
-                onChange={() => changeType("qr")}
+                value={values[field] || ""}
+                onChange={(event) =>
+                  setValues({ ...values, [field]: event.target.value })
+                }
               />
-              QR Kod
             </label>
-            <label className="radio-option">
-              <input
-                type="radio"
-                name="barcodeType"
-                checked={barcodeType === "strip"}
-                onChange={() => changeType("strip")}
-              />
-              Şerit (Code128)
-            </label>
-          </div>
-        </div>
+          ))}
 
-        {error && <p className="error">{error}</p>}
-        <button type="submit" disabled={saving || !unitId}>
-          {saving ? "Oluşturuluyor..." : "Oluştur"}
-        </button>
-      </form>
-
-      {created && (
-        <div className="card">
-          <h2>Oluşturulan Barkod</h2>
-          <div className="label">
-            <div className="label-name">{created.name}</div>
-            <div className="label-body">
-              <BarcodePreview name={created.name} type={barcodeType} />
-              <div className="label-fields">
-                {Object.entries(created.field_values).map(([field, value]) => (
-                  <span key={field}>
-                    {field}: {value}
-                  </span>
-                ))}
-              </div>
+          <div className="field-list">
+            <span className="group-label">Görsel Tipi</span>
+            <div className="radio-row">
+              <label className="radio-option">
+                <input
+                  type="radio"
+                  name="barcodeType"
+                  checked={barcodeType === "qr"}
+                  onChange={() => changeType("qr")}
+                />
+                QR Kod
+              </label>
+              <label className="radio-option">
+                <input
+                  type="radio"
+                  name="barcodeType"
+                  checked={barcodeType === "strip"}
+                  onChange={() => changeType("strip")}
+                />
+                Şerit (Code128)
+              </label>
             </div>
           </div>
-          <button
-            type="button"
-            className="button-secondary"
-            style={{ marginTop: "1rem", display: "block" }}
-            onClick={() => navigate(`/print?barcode=${created.id}`)}
-          >
-            Bu Barkodu Yazdır
+
+          {error && <p className="error">{error}</p>}
+          <button type="submit" disabled={saving || !unitId}>
+            {saving ? "Oluşturuluyor..." : "Oluştur"}
           </button>
+        </form>
+
+        <div className="card">
+          <h2>Önizleme</h2>
+          {created ? (
+            <>
+              <div className="label">
+                <div className="label-name">{created.name}</div>
+                <div className="label-body">
+                  <BarcodePreview name={created.name} type={barcodeType} />
+                  <div className="label-fields">
+                    {Object.entries(created.field_values).map(([field, value]) => (
+                      <span key={field}>
+                        {field}: {value}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <div className="preview-actions">
+                <button
+                  type="button"
+                  className="button-secondary"
+                  onClick={() => navigate(`/print?barcode=${created.id}`)}
+                >
+                  Bu Barkodu Yazdır
+                </button>
+              </div>
+            </>
+          ) : (
+            <div className="empty">
+              Barkod oluşturduğunda etiket önizlemesi burada görünecek.
+            </div>
+          )}
         </div>
-      )}
+      </div>
     </>
   );
 }
