@@ -216,3 +216,56 @@ th {
   text-transform: uppercase;
   color: #6b7280;
 }
+
+select {
+  padding: 0.55rem 0.7rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 1rem;
+  background: #fff;
+}
+
+select:focus {
+  outline: 2px solid #2563eb;
+  border-color: transparent;
+}
+
+.radio-row {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.radio-option {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 400;
+}
+
+.label {
+  display: inline-block;
+  border: 2px dashed #9ca3af;
+  border-radius: 4px;
+  padding: 0.8rem 1rem;
+  background: #fff;
+  min-width: 260px;
+}
+
+.label-name {
+  font-weight: 700;
+  text-align: right;
+  margin-bottom: 0.5rem;
+}
+
+.label-body {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.label-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  font-size: 0.95rem;
+}

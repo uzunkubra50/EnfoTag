@@ -15,6 +15,7 @@ export default function Layout() {
         <span className="brand">Barkod Yönetim Sistemi</span>
         <nav>
           <NavLink to="/units">Birimler</NavLink>
+          <NavLink to="/barcodes/new">Barkod Oluştur</NavLink>
         </nav>
         <button className="button-secondary button-small" onClick={handleLogout}>
           Çıkış Yap
