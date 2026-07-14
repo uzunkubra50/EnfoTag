@@ -348,6 +348,45 @@ select:focus {
   font-size: 2.8mm;
 }
 
+.list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.list-header h2 {
+  margin: 0;
+}
+
+.badge {
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.badge-active {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.badge-passive {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+tr.inactive td {
+  color: #9ca3af;
+}
+
+.actions {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
 @media print {
   .topbar,
   .no-print {
