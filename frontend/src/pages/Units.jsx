@@ -1,21 +1,40 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { apiErrorMessage } from "../api/client";
 import { createUnit, getUnits } from "../api/units";
+import EmptyState from "../components/EmptyState";
+import PageHeader from "../components/PageHeader";
+import { TableSkeleton } from "../components/Skeleton";
+import Spinner from "../components/Spinner";
+import { useToast } from "../components/Toast";
+
+function LayersIcon() {
+  return (
+    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <polygon points="12 2 2 7 12 12 22 7 12 2" />
+      <polyline points="2 17 12 22 22 17" />
+      <polyline points="2 12 12 17 22 12" />
+    </svg>
+  );
+}
 
 export default function Units() {
   const [units, setUnits] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [name, setName] = useState("");
   const [prefix, setPrefix] = useState("");
   const [fields, setFields] = useState([]);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
   const [saving, setSaving] = useState(false);
+  const nameInputRef = useRef(null);
+  const toast = useToast();
 
   async function loadUnits() {
     try {
       setUnits(await getUnits());
     } catch (err) {
       setError(apiErrorMessage(err, "Birimler yüklenemedi."));
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -38,7 +57,6 @@ export default function Units() {
   async function handleSubmit(event) {
     event.preventDefault();
     setError("");
-    setSuccess("");
     setSaving(true);
     try {
       // empty field boxes are not saved
@@ -48,7 +66,7 @@ export default function Units() {
         barcode_prefix: prefix,
         fields: cleanedFields,
       });
-      setSuccess(`"${unit.name}" birimi eklendi (ön ek: ${unit.barcode_prefix}).`);
+      toast.success(`"${unit.name}" birimi eklendi (ön ek: ${unit.barcode_prefix}).`);
       setName("");
       setPrefix("");
       setFields([]);
@@ -62,10 +80,10 @@ export default function Units() {
 
   return (
     <>
-      <header className="page-head">
-        <h1>Birimler</h1>
-        <p>Barkod üretecek kurum birimlerini ve indeks alanlarını tanımla.</p>
-      </header>
+      <PageHeader
+        title="Birimler"
+        description="Barkod üretecek kurum birimlerini ve indeks alanlarını tanımla."
+      />
 
       <div className="units-grid">
       <form className="card form-grid" onSubmit={handleSubmit}>
@@ -73,6 +91,7 @@ export default function Units() {
         <label>
           Birim Adı
           <input
+            ref={nameInputRef}
             value={name}
             onChange={(event) => setName(event.target.value)}
             placeholder="ör. Proje Tasdik ve Yapı Denetim Şefliği"
@@ -80,14 +99,18 @@ export default function Units() {
           />
         </label>
         <label>
-          Barkod Ön Eki <span className="hint">(otomatik büyük harfe çevrilir)</span>
+          Barkod Ön Eki
           <input
+            className="mono"
             value={prefix}
             onChange={(event) => setPrefix(event.target.value)}
             placeholder="ör. PTYD"
             maxLength={10}
             required
           />
+          <span className="hint">
+            Otomatik büyük harfe çevrilir; barkod numaralarının başına eklenir (en fazla 10 karakter).
+          </span>
         </label>
 
         <div className="field-list">
@@ -111,19 +134,37 @@ export default function Units() {
           <button type="button" className="button-small button-secondary" onClick={addField}>
             + Alan Ekle
           </button>
+          <span className="hint">
+            Barkod oluştururken doldurulacak alanlar (ör. Ada, Parsel). Boş bırakılabilir.
+          </span>
         </div>
 
         {error && <p className="error">{error}</p>}
-        {success && <p className="success">{success}</p>}
         <button type="submit" disabled={saving}>
+          {saving && <Spinner />}
           {saving ? "Kaydediliyor..." : "Kaydet"}
         </button>
       </form>
 
       <div className="card">
         <h2>Kayıtlı Birimler</h2>
-        {units.length === 0 ? (
-          <div className="empty">Henüz birim eklenmemiş. İlk birimini soldaki formdan oluştur.</div>
+        {loading ? (
+          <TableSkeleton rows={4} />
+        ) : units.length === 0 ? (
+          <EmptyState
+            icon={<LayersIcon />}
+            title="Henüz birim yok"
+            text="Barkod üretmeye başlamak için önce bir birim tanımlaman gerekiyor."
+            action={
+              <button
+                type="button"
+                className="button-secondary"
+                onClick={() => nameInputRef.current?.focus()}
+              >
+                İlk Birimi Oluştur
+              </button>
+            }
+          />
         ) : (
           <table>
             <thead>
@@ -137,7 +178,9 @@ export default function Units() {
               {units.map((unit) => (
                 <tr key={unit.id}>
                   <td>{unit.name}</td>
-                  <td>{unit.barcode_prefix}</td>
+                  <td>
+                    <span className="prefix-chip">{unit.barcode_prefix}</span>
+                  </td>
                   <td>{unit.fields.length > 0 ? unit.fields.join(", ") : "—"}</td>
                 </tr>
               ))}

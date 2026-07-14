@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { login } from "../api/auth";
 import BrandMark from "../components/BrandMark";
+import Spinner from "../components/Spinner";
 
 export default function Login() {
   const [username, setUsername] = useState("");
@@ -41,6 +42,7 @@ export default function Login() {
           <label>
             Kullanıcı Adı
             <input
+              className={error ? "input-error" : ""}
               value={username}
               onChange={(event) => setUsername(event.target.value)}
               placeholder="kullanıcı adın"
@@ -51,6 +53,7 @@ export default function Login() {
           <label>
             Şifre
             <input
+              className={error ? "input-error" : ""}
               type="password"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
@@ -60,6 +63,7 @@ export default function Login() {
           </label>
           {error && <p className="error">{error}</p>}
           <button type="submit" disabled={loading}>
+            {loading && <Spinner />}
             {loading ? "Giriş yapılıyor..." : "Giriş Yap"}
           </button>
         </form>

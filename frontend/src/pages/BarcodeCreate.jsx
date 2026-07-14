@@ -4,6 +4,18 @@ import { createBarcode } from "../api/barcodes";
 import { apiErrorMessage } from "../api/client";
 import { getUnit, getUnits } from "../api/units";
 import BarcodePreview from "../components/BarcodePreview";
+import PageHeader from "../components/PageHeader";
+import Spinner from "../components/Spinner";
+import { useToast } from "../components/Toast";
+
+function TagIcon() {
+  return (
+    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
+      <line x1="7" y1="7" x2="7.01" y2="7" />
+    </svg>
+  );
+}
 
 export default function BarcodeCreate() {
   const [units, setUnits] = useState([]);
@@ -17,6 +29,7 @@ export default function BarcodeCreate() {
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
   const navigate = useNavigate();
+  const toast = useToast();
 
   useEffect(() => {
     getUnits()
@@ -66,6 +79,7 @@ export default function BarcodeCreate() {
       });
       setCreated(barcode);
       setValues({});
+      toast.success(`${barcode.name} oluşturuldu.`);
     } catch (err) {
       setError(apiErrorMessage(err, "Barkod oluşturulamadı."));
     } finally {
@@ -75,10 +89,10 @@ export default function BarcodeCreate() {
 
   return (
     <>
-      <header className="page-head">
-        <h1>Barkod Oluştur</h1>
-        <p>Birimi seç, indeks alanlarını doldur; sıradaki numara otomatik verilir.</p>
-      </header>
+      <PageHeader
+        title="Barkod Oluştur"
+        description="Birimi seç, indeks alanlarını doldur; sıradaki numara otomatik verilir."
+      />
 
       <div className="create-grid">
         <form className="card form-grid" onSubmit={handleSubmit}>
@@ -93,17 +107,19 @@ export default function BarcodeCreate() {
                 </option>
               ))}
             </select>
+            <span className="hint">Numara, birimin ön ekiyle otomatik üretilir.</span>
           </label>
 
           {unitFields.map((field) => (
             <label key={field}>
-              {field} <span className="hint">(boş bırakılırsa etikete basılmaz)</span>
+              {field}
               <input
                 value={values[field] || ""}
                 onChange={(event) =>
                   setValues({ ...values, [field]: event.target.value })
                 }
               />
+              <span className="hint">Boş bırakılırsa etikete basılmaz.</span>
             </label>
           ))}
 
@@ -133,6 +149,7 @@ export default function BarcodeCreate() {
 
           {error && <p className="error">{error}</p>}
           <button type="submit" disabled={saving || !unitId}>
+            {saving && <Spinner />}
             {saving ? "Oluşturuluyor..." : "Oluştur"}
           </button>
         </form>
@@ -165,8 +182,12 @@ export default function BarcodeCreate() {
               </div>
             </>
           ) : (
-            <div className="empty">
-              Barkod oluşturduğunda etiket önizlemesi burada görünecek.
+            <div className="empty-state">
+              <TagIcon />
+              <span className="empty-title">Henüz barkod oluşturulmadı</span>
+              <p className="empty-text">
+                Barkod oluşturduğunda etiket önizlemesi burada görünecek.
+              </p>
             </div>
           )}
         </div>

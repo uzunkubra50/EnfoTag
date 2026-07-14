@@ -4,6 +4,9 @@ import { getBarcode } from "../api/barcodes";
 import { apiErrorMessage } from "../api/client";
 import { createPreset, getPresets } from "../api/presets";
 import BarcodePreview from "../components/BarcodePreview";
+import EmptyState from "../components/EmptyState";
+import PageHeader from "../components/PageHeader";
+import { useToast } from "../components/Toast";
 
 const DEFAULT_SETTINGS = {
   paper_w: 210,
@@ -33,6 +36,16 @@ const NUMBER_FIELDS = [
   ["margin_right", "Sağ Kenar Payı (mm)"],
 ];
 
+function PrinterIcon() {
+  return (
+    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <polyline points="6 9 6 2 18 2 18 9" />
+      <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+      <rect x="6" y="14" width="12" height="8" />
+    </svg>
+  );
+}
+
 export default function BarcodePrint() {
   const [searchParams] = useSearchParams();
   const barcodeId = searchParams.get("barcode");
@@ -43,10 +56,10 @@ export default function BarcodePrint() {
   const [presetId, setPresetId] = useState("");
   const [presetName, setPresetName] = useState("");
   const [error, setError] = useState("");
-  const [info, setInfo] = useState("");
   const [barcodeType, setBarcodeType] = useState(
     localStorage.getItem("barcodeType") || "qr"
   );
+  const toast = useToast();
 
   function changeType(type) {
     setBarcodeType(type);
@@ -85,10 +98,8 @@ export default function BarcodePrint() {
   }
 
   async function handleSavePreset() {
-    setError("");
-    setInfo("");
     if (!presetName.trim()) {
-      setError("Önce yeni preset için bir ad girin.");
+      toast.error("Önce yeni preset için bir ad girin.");
       return;
     }
     try {
@@ -96,9 +107,9 @@ export default function BarcodePrint() {
       setPresets([...presets, preset]);
       setPresetId(String(preset.id));
       setPresetName("");
-      setInfo(`"${preset.name}" preset'i kaydedildi.`);
+      toast.success(`"${preset.name}" preset'i kaydedildi.`);
     } catch (err) {
-      setError(apiErrorMessage(err, "Preset kaydedilemedi."));
+      toast.error(apiErrorMessage(err, "Preset kaydedilemedi."));
     }
   }
 
@@ -124,16 +135,22 @@ export default function BarcodePrint() {
   if (!barcodeId) {
     return (
       <>
-        <header className="page-head">
-          <h1>Barkod Yazdır</h1>
-          <p>Etiket ölçülerini ayarla, preset olarak kaydet ve yazdır.</p>
-        </header>
+        <PageHeader
+          title="Barkod Yazdır"
+          description="Etiket ölçülerini ayarla, preset olarak kaydet ve yazdır."
+        />
         <div className="card">
-          <p>
-            Yazdırılacak barkod seçilmedi.{" "}
-            <Link to="/barcodes/new">Barkod Oluştur</Link> sayfasında bir barkod
-            oluşturup "Bu Barkodu Yazdır" butonunu kullanabilirsin.
-          </p>
+          <EmptyState
+            icon={<PrinterIcon />}
+            title="Yazdırılacak barkod seçilmedi"
+            text='Önce bir barkod oluşturup "Bu Barkodu Yazdır" butonunu kullan
+              veya listeden bir barkod seç.'
+            action={
+              <Link className="button-link" to="/barcodes/new">
+                Barkod Oluştur
+              </Link>
+            }
+          />
         </div>
       </>
     );
@@ -141,10 +158,11 @@ export default function BarcodePrint() {
 
   return (
     <>
-      <header className="page-head no-print">
-        <h1>Barkod Yazdır</h1>
-        <p>Kağıt ve etiket ölçülerini ayarla; önizleme gerçek boyuttadır (mm).</p>
-      </header>
+      <PageHeader
+        className="no-print"
+        title="Barkod Yazdır"
+        description="Kağıt ve etiket ölçülerini ayarla; önizleme gerçek boyuttadır (mm)."
+      />
 
       <div className="card form-grid no-print">
         <h2>Yazdırma Ayarları</h2>
@@ -228,7 +246,6 @@ export default function BarcodePrint() {
         )}
 
         {error && <p className="error">{error}</p>}
-        {info && <p className="success">{info}</p>}
         <button type="button" onClick={() => window.print()} disabled={!barcode}>
           Yazdır
         </button>
@@ -236,8 +253,9 @@ export default function BarcodePrint() {
 
       {barcode && (
         <div className="card no-print">
-          <strong>{barcode.name}</strong> — önizleme gerçek boyuttadır (mm). Ekran ile
-          yazıcı çıktısı farklı olabilir; tarayıcının baskı önizlemesiyle de kontrol et.
+          <strong className="code-text">{barcode.name}</strong> — önizleme gerçek
+          boyuttadır (mm). Ekran ile yazıcı çıktısı farklı olabilir; tarayıcının baskı
+          önizlemesiyle de kontrol et.
         </div>
       )}
 

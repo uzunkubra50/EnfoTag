@@ -88,6 +88,7 @@ export default function Layout() {
             <span className="brand-sub">Barkod Yönetim</span>
           </span>
         </div>
+        <div className="brand-divider" aria-hidden="true" />
 
         <span className="side-label">Menü</span>
         <nav className="side-nav">
