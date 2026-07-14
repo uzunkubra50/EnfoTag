@@ -126,9 +126,11 @@ Tüm endpoint'ler `Authorization: Bearer <access_token>` başlığı gerektirir 
    üretilen barkodu QR veya şerit olarak çizer (tercih `localStorage`'da saklanır).
 4. **Barkod Yazdır** — kağıt/etiket boyutu, satır başına adet, boşluk ve kenar payı
    ayarlarıyla mm bazlı CSS Grid önizleme + `window.print()`; ayarlar preset olarak
-   backend'e kaydedilip tekrar seçilebilir.
-5. **Barkod Listesi** — düzenleme, pasife alma/aktifleştirme (gerçek silme yok),
-   herhangi bir barkodu seçip yeniden yazdırma ekranına gönderme.
+   backend'e kaydedilip tekrar seçilebilir. QR/şerit tipi yazdırma anında da
+   değiştirilebilir; etiketler kağıda sığmıyorsa uyarı gösterilir.
+5. **Barkod Listesi** — ada veya alan değerine göre arama, birim filtresi,
+   düzenleme, pasife alma/aktifleştirme (gerçek silme yok), herhangi bir barkodu
+   seçip yeniden yazdırma ekranına gönderme.
 
 ## Bilinen Kısıtlar
 

@@ -44,7 +44,14 @@ export default function BarcodePrint() {
   const [presetName, setPresetName] = useState("");
   const [error, setError] = useState("");
   const [info, setInfo] = useState("");
-  const barcodeType = localStorage.getItem("barcodeType") || "qr";
+  const [barcodeType, setBarcodeType] = useState(
+    localStorage.getItem("barcodeType") || "qr"
+  );
+
+  function changeType(type) {
+    setBarcodeType(type);
+    localStorage.setItem("barcodeType", type); // same preference key as the create page
+  }
 
   useEffect(() => {
     getPresets()
@@ -97,6 +104,22 @@ export default function BarcodePrint() {
 
   const count = Math.max(0, Math.min(500, Math.floor(num("count"))));
   const perRow = Math.max(1, Math.min(4, Math.floor(num("per_row")) || 1));
+
+  // does the label grid actually fit the configured paper?
+  const requiredWidth =
+    num("margin_left") +
+    num("margin_right") +
+    perRow * num("barcode_w") +
+    (perRow - 1) * num("gap");
+  const rowCount = count > 0 ? Math.ceil(count / perRow) : 0;
+  const requiredHeight =
+    num("margin_top") +
+    num("margin_bottom") +
+    rowCount * num("barcode_h") +
+    Math.max(0, rowCount - 1) * num("gap");
+  const widthOverflow = num("paper_w") > 0 && requiredWidth > num("paper_w");
+  const heightOverflow = num("paper_h") > 0 && requiredHeight > num("paper_h");
+  const round1 = (value) => Math.round(value * 10) / 10;
 
   if (!barcodeId) {
     return (
@@ -165,6 +188,44 @@ export default function BarcodePrint() {
             </label>
           ))}
         </div>
+
+        <div className="field-list">
+          <span className="group-label">Görsel Tipi</span>
+          <div className="radio-row">
+            <label className="radio-option">
+              <input
+                type="radio"
+                name="barcodeType"
+                checked={barcodeType === "qr"}
+                onChange={() => changeType("qr")}
+              />
+              QR Kod
+            </label>
+            <label className="radio-option">
+              <input
+                type="radio"
+                name="barcodeType"
+                checked={barcodeType === "strip"}
+                onChange={() => changeType("strip")}
+              />
+              Şerit (Code128)
+            </label>
+          </div>
+        </div>
+
+        {widthOverflow && (
+          <p className="warning">
+            Etiketler kağıt genişliğine sığmıyor: bu ayarlar {round1(requiredWidth)} mm
+            gerektiriyor, kağıt {num("paper_w")} mm. Satır başına barkodu, etiket
+            genişliğini veya boşlukları azalt.
+          </p>
+        )}
+        {heightOverflow && (
+          <p className="warning">
+            Etiketler tek sayfaya sığmıyor ({round1(requiredHeight)} mm gerekiyor, kağıt{" "}
+            {num("paper_h")} mm) — yazdırmada birden fazla sayfa çıkacak.
+          </p>
+        )}
 
         {error && <p className="error">{error}</p>}
         {info && <p className="success">{info}</p>}

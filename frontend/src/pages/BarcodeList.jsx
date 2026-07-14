@@ -2,10 +2,13 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getBarcodes, updateBarcode } from "../api/barcodes";
 import { apiErrorMessage } from "../api/client";
-import { getUnit } from "../api/units";
+import { getUnit, getUnits } from "../api/units";
 
 export default function BarcodeList() {
   const [barcodes, setBarcodes] = useState([]);
+  const [units, setUnits] = useState([]);
+  const [query, setQuery] = useState("");
+  const [unitFilter, setUnitFilter] = useState("");
   const [showInactive, setShowInactive] = useState(false);
   const [editing, setEditing] = useState(null); // { barcode, fields, values }
   const [error, setError] = useState("");
@@ -24,6 +27,11 @@ export default function BarcodeList() {
   useEffect(() => {
     load(showInactive);
   }, [showInactive]);
+
+  useEffect(() => {
+    // only feeds the filter dropdown; the list still works if this fails
+    getUnits().then(setUnits).catch(() => {});
+  }, []);
 
   async function startEdit(barcode) {
     setError("");
@@ -93,6 +101,23 @@ export default function BarcodeList() {
     return entries.map(([field, value]) => `${field}: ${value}`).join(", ");
   }
 
+  // search matches the barcode name and the filled field values
+  const searchText = query.trim().toLowerCase();
+  const visibleBarcodes = barcodes.filter((barcode) => {
+    if (unitFilter && String(barcode.unit_id) !== unitFilter) {
+      return false;
+    }
+    if (!searchText) {
+      return true;
+    }
+    if (barcode.name.toLowerCase().includes(searchText)) {
+      return true;
+    }
+    return Object.values(barcode.field_values).some((value) =>
+      String(value).toLowerCase().includes(searchText)
+    );
+  });
+
   return (
     <>
       <header className="page-head">
@@ -138,14 +163,33 @@ export default function BarcodeList() {
       <div className="card">
         <div className="list-header">
           <h2>Barkodlar</h2>
-          <label className="radio-option">
+          <div className="toolbar">
             <input
-              type="checkbox"
-              checked={showInactive}
-              onChange={(event) => setShowInactive(event.target.checked)}
+              className="search-input"
+              placeholder="Barkod adı veya alan değeri ara..."
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
             />
-            Pasifleri de göster
-          </label>
+            <select
+              value={unitFilter}
+              onChange={(event) => setUnitFilter(event.target.value)}
+            >
+              <option value="">Tüm birimler</option>
+              {units.map((unit) => (
+                <option key={unit.id} value={unit.id}>
+                  {unit.name} ({unit.barcode_prefix})
+                </option>
+              ))}
+            </select>
+            <label className="radio-option">
+              <input
+                type="checkbox"
+                checked={showInactive}
+                onChange={(event) => setShowInactive(event.target.checked)}
+              />
+              Pasifleri de göster
+            </label>
+          </div>
         </div>
 
         {error && <p className="error">{error}</p>}
@@ -153,6 +197,8 @@ export default function BarcodeList() {
 
         {barcodes.length === 0 ? (
           <div className="empty">Gösterilecek barkod yok.</div>
+        ) : visibleBarcodes.length === 0 ? (
+          <div className="empty">Arama ve filtrelerle eşleşen barkod yok.</div>
         ) : (
           <table>
             <thead>
@@ -160,17 +206,19 @@ export default function BarcodeList() {
                 <th>Barkod</th>
                 <th>Birim</th>
                 <th>Alanlar</th>
+                <th>Oluşturan</th>
                 <th>Oluşturma</th>
                 <th>Durum</th>
                 <th>İşlemler</th>
               </tr>
             </thead>
             <tbody>
-              {barcodes.map((barcode) => (
+              {visibleBarcodes.map((barcode) => (
                 <tr key={barcode.id} className={barcode.is_active ? "" : "inactive"}>
                   <td>{barcode.name}</td>
                   <td>{barcode.unit_name}</td>
                   <td>{fieldSummary(barcode.field_values)}</td>
+                  <td>{barcode.created_by}</td>
                   <td>{new Date(barcode.created_at).toLocaleDateString("tr-TR")}</td>
                   <td>
                     <span
